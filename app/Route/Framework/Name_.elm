@@ -1,4 +1,4 @@
-module Route.Framework.Name_.Stage_ exposing (ActionData, Data, Model, Msg, RouteParams, route)
+module Route.Framework.Name_ exposing (ActionData, Data, Model, Msg, RouteParams, route)
 
 {-| 
 @docs Model, Msg, RouteParams, route, Data, ActionData
@@ -29,7 +29,7 @@ type Msg
 
 
 type alias RouteParams =
-    { name : String, stage : String }
+    { name : String }
 
 
 route : RouteBuilder.StatefulRoute RouteParams Data ActionData Model Msg
@@ -96,7 +96,7 @@ view :
     -> Model
     -> View.View (PagesMsg.PagesMsg Msg)
 view app shared model =
-    { title = "Framework.Name_.Stage_"
+    { title = "Framework.Name_"
     , body = [ Html.h2 [] [ Html.text "New Page" ] ]
     }
 
