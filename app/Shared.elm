@@ -17,7 +17,7 @@ import UrlPath exposing (UrlPath)
 import View exposing (View)
 
 
-template : SharedTemplate Msg Model Data Msg
+template : SharedTemplate Msg Model Data msg
 template =
     { init = init
     , update = update
@@ -34,8 +34,8 @@ type Msg
     | SwitchFramework String
 
 
-type alias StyledPage =
-    { body : List (Html Msg)
+type alias StyledPage msg =
+    { body : List (Html msg)
     , title : String
     }
 
@@ -103,7 +103,7 @@ data =
     BackendTask.succeed ()
 
 
-frameworkNav : List String -> Html.Styled.Html Msg
+frameworkNav : List String -> Html.Styled.Html msg
 frameworkNav fws =
     Html.Styled.ul
         [ css
@@ -118,7 +118,7 @@ frameworkNav fws =
                     [ css
                         [ margin (px 5) ]
                     ]
-                    [ Html.Styled.a [ onClick (SwitchFramework name) ] [ Html.Styled.text name ]
+                    [ Html.Styled.a [] [ Html.Styled.text name ]
                     ]
             )
             fws
@@ -137,8 +137,8 @@ view :
         }
     -> Model
     -> (Msg -> msg)
-    -> View Msg
-    -> StyledPage
+    -> View msg
+    -> StyledPage msg
 view sharedData page model toMsg pageView =
     { body =
         List.map toUnstyled <|
