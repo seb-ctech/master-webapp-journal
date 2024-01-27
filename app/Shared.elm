@@ -1,25 +1,23 @@
 module Shared exposing (Data, Model, Msg(..), SharedMsg(..), template)
 
 import BackendTask exposing (BackendTask)
+import Css exposing (..)
 import Effect exposing (Effect)
 import FatalError exposing (FatalError)
-
+import Html exposing (Html)
+import Html.Events
 import Html.Styled exposing (toUnstyled)
 import Html.Styled.Attributes exposing (css, href, src)
 import Html.Styled.Events exposing (onClick)
-import Html exposing (Html)
-import Css exposing (..)
-import Html.Events
-
 import Pages.Flags
 import Pages.PageUrl exposing (PageUrl)
-import UrlPath exposing (UrlPath)
 import Route exposing (Route)
 import SharedTemplate exposing (SharedTemplate)
+import UrlPath exposing (UrlPath)
 import View exposing (View)
 
 
-template : SharedTemplate Msg Model Data msg
+template : SharedTemplate Msg Model Data Msg
 template =
     { init = init
     , update = update
@@ -35,6 +33,13 @@ type Msg
     | NextStage Int
     | SwitchFramework String
 
+
+type alias StyledPage =
+    { body : List (Html Msg)
+    , title : String
+    }
+
+
 type alias Data =
     ()
 
@@ -42,10 +47,12 @@ type alias Data =
 type SharedMsg
     = NoOp
 
-type alias Model = 
-  { framework : String
-  , progressStage : Int
-  }
+
+type alias Model =
+    { framework : String
+    , progressStage : Int
+    }
+
 
 init :
     Pages.Flags.Flags
@@ -61,10 +68,9 @@ init :
             }
     -> ( Model, Effect Msg )
 init flags maybePagePath =
-    ( 
-        { framework = "something"
-        , progressStage = 0
-        }
+    ( { framework = "something"
+      , progressStage = 0
+      }
     , Effect.none
     )
 
@@ -73,14 +79,19 @@ update : Msg -> Model -> ( Model, Effect Msg )
 update msg model =
     case msg of
         SharedMsg globalMsg ->
-            (model, Effect.none)
-        NextStage offset ->
-            ({ model | progressStage = model.progressStage + offset}, Effect.none)
-        SwitchFramework name -> 
-            ({ model | framework = name}, Effect.none)
--- TODO: Find a way to integrate the Framework switch with the idioms provided by the framework    
+            ( model, Effect.none )
 
--- type Msg = 
+        NextStage offset ->
+            ( { model | progressStage = model.progressStage + offset }, Effect.none )
+
+        SwitchFramework name ->
+            ( { model | framework = name }, Effect.none )
+
+
+
+-- TODO: Find a way to integrate the Framework switch with the idioms provided by the framework
+-- type Msg =
+
 
 subscriptions : UrlPath -> Model -> Sub Msg
 subscriptions _ _ =
@@ -91,27 +102,33 @@ data : BackendTask FatalError Data
 data =
     BackendTask.succeed ()
 
+
 frameworkNav : List String -> Html.Styled.Html Msg
-frameworkNav fws = 
-  Html.Styled.ul 
-    [ 
-      css 
-        [ displayFlex
-        , flexDirection row
-        , listStyle none
+frameworkNav fws =
+    Html.Styled.ul
+        [ css
+            [ displayFlex
+            , flexDirection row
+            , listStyle none
+            ]
         ]
-    ]
-    (List.map (\name -> 
-      Html.Styled.li 
-        [ 
-          css 
-          [ margin (px 5)]
-        ] 
-        [Html.Styled.a [onClick (SwitchFramework name)] [Html.Styled.text name]
-        ]) 
-      fws)
+        (List.map
+            (\name ->
+                Html.Styled.li
+                    [ css
+                        [ margin (px 5) ]
+                    ]
+                    [ Html.Styled.a [ onClick (SwitchFramework name) ] [ Html.Styled.text name ]
+                    ]
+            )
+            fws
+        )
+
+
 
 -- FIX: The type mismatch
+
+
 view :
     Data
     ->
@@ -121,17 +138,16 @@ view :
     -> Model
     -> (Msg -> msg)
     -> View Msg
-    -> { body : List (Html msg), title : String }
+    -> StyledPage
 view sharedData page model toMsg pageView =
-    { body = List.map toUnstyled <| 
-        [ 
-            Html.Styled.div 
+    { body =
+        List.map toUnstyled <|
+            [ Html.Styled.div
                 []
-                [ 
-                    frameworkNav ["TidalCycles", "Euterpea", "Kulitta"]
-                , Html.Styled.h1 [] [Html.Styled.text ("You are looking at -> " ++ model.framework)]
+                [ frameworkNav [ "TidalCycles", "Euterpea", "Kulitta" ]
+                , Html.Styled.h1 [] [ Html.Styled.text ("You are looking at -> " ++ model.framework) ]
                 ]
-            , Html.Styled.div [] pageView.body 
-        ]
-        , title = pageView.title
+            , Html.Styled.div [] pageView.body
+            ]
+    , title = pageView.title
     }
