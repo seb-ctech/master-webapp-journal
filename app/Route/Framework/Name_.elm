@@ -10,7 +10,7 @@ import Effect
 import ErrorPage
 import FatalError
 import Head
-import Html
+import Html.Styled as Html
 import PagesMsg
 import RouteBuilder
 import Server.Request
@@ -65,8 +65,7 @@ update app shared msg model =
 
 subscriptions :
     RouteParams -> UrlPath.UrlPath -> Shared.Model -> Model -> Sub Msg
-subscriptions routeParams path shared model =
-    Subnone
+subscriptions routeParams path shared model = Sub.none
 
 
 type alias Data =

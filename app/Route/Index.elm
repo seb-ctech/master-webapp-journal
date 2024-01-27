@@ -4,7 +4,7 @@ import BackendTask exposing (BackendTask)
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
-import Html
+import Html.Styled as Html
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import Route
@@ -78,7 +78,7 @@ view :
 view app shared =
     { title = "elm-pages is running"
     , body =
-        [ Html.h1 [] [ Html.text "elm-pages is up and running!" ]
+        [ Html.h1 [] [ Html.text "elm-pages has been refactored!" ]
         , Html.p []
             [ Html.text <| "The message is: " ++ app.data.message
             ]

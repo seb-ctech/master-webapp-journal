@@ -3,8 +3,14 @@ module Shared exposing (Data, Model, Msg(..), SharedMsg(..), template)
 import BackendTask exposing (BackendTask)
 import Effect exposing (Effect)
 import FatalError exposing (FatalError)
+
+import Html.Styled exposing (toUnstyled)
+import Html.Styled.Attributes exposing (css, href, src)
+import Html.Styled.Events exposing (onClick)
 import Html exposing (Html)
+import Css exposing (..)
 import Html.Events
+
 import Pages.Flags
 import Pages.PageUrl exposing (PageUrl)
 import UrlPath exposing (UrlPath)
@@ -26,8 +32,8 @@ template =
 
 type Msg
     = SharedMsg SharedMsg
-    | MenuClicked
-
+    | NextStage Int
+    | SwitchFramework String
 
 type alias Data =
     ()
@@ -36,11 +42,10 @@ type alias Data =
 type SharedMsg
     = NoOp
 
-
-type alias Model =
-    { showMenu : Bool
-    }
-
+type alias Model = 
+  { framework : String
+  , progressStage : Int
+  }
 
 init :
     Pages.Flags.Flags
@@ -56,7 +61,10 @@ init :
             }
     -> ( Model, Effect Msg )
 init flags maybePagePath =
-    ( { showMenu = False }
+    ( 
+        { framework = "something"
+        , progressStage = 0
+        }
     , Effect.none
     )
 
@@ -65,11 +73,14 @@ update : Msg -> Model -> ( Model, Effect Msg )
 update msg model =
     case msg of
         SharedMsg globalMsg ->
-            ( model, Effect.none )
+            (model, Effect.none)
+        NextStage offset ->
+            ({ model | progressStage = model.progressStage + offset}, Effect.none)
+        SwitchFramework name -> 
+            ({ model | framework = name}, Effect.none)
+-- TODO: Find a way to integrate the Framework switch with the idioms provided by the framework    
 
-        MenuClicked ->
-            ( { model | showMenu = not model.showMenu }, Effect.none )
-
+-- type Msg = 
 
 subscriptions : UrlPath -> Model -> Sub Msg
 subscriptions _ _ =
@@ -80,7 +91,27 @@ data : BackendTask FatalError Data
 data =
     BackendTask.succeed ()
 
+frameworkNav : List String -> Html.Styled.Html Msg
+frameworkNav fws = 
+  Html.Styled.ul 
+    [ 
+      css 
+        [ displayFlex
+        , flexDirection row
+        , listStyle none
+        ]
+    ]
+    (List.map (\name -> 
+      Html.Styled.li 
+        [ 
+          css 
+          [ margin (px 5)]
+        ] 
+        [Html.Styled.a [onClick (SwitchFramework name)] [Html.Styled.text name]
+        ]) 
+      fws)
 
+-- FIX: The type mismatch
 view :
     Data
     ->
@@ -89,32 +120,18 @@ view :
         }
     -> Model
     -> (Msg -> msg)
-    -> View msg
+    -> View Msg
     -> { body : List (Html msg), title : String }
 view sharedData page model toMsg pageView =
-    { body =
-        [ Html.nav []
-            [ Html.button
-                [ Html.Events.onClick MenuClicked ]
-                [ Html.text
-                    (if model.showMenu then
-                        "Close Menu"
-
-                     else
-                        "Open Menu"
-                    )
+    { body = List.map toUnstyled <| 
+        [ 
+            Html.Styled.div 
+                []
+                [ 
+                    frameworkNav ["TidalCycles", "Euterpea", "Kulitta"]
+                , Html.Styled.h1 [] [Html.Styled.text ("You are looking at -> " ++ model.framework)]
                 ]
-            , if model.showMenu then
-                Html.ul []
-                    [ Html.li [] [ Html.text "Menu item 1" ]
-                    , Html.li [] [ Html.text "Menu item 2" ]
-                    ]
-
-              else
-                Html.text ""
-            ]
-            |> Html.map toMsg
-        , Html.main_ [] pageView.body
+            , Html.Styled.div [] pageView.body 
         ]
-    , title = pageView.title
+        , title = pageView.title
     }
