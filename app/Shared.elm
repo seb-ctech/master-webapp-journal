@@ -103,7 +103,7 @@ data =
     BackendTask.succeed ()
 
 
-frameworkNav : List String -> Html.Styled.Html msg
+frameworkNav : List String -> Html.Styled.Html Msg
 frameworkNav fws =
     Html.Styled.ul
         [ css
@@ -118,7 +118,7 @@ frameworkNav fws =
                     [ css
                         [ margin (px 5) ]
                     ]
-                    [ Html.Styled.a [] [ Html.Styled.text name ]
+                    [ Html.Styled.button [ onClick (SwitchFramework name) ] [ Html.Styled.text name ]
                     ]
             )
             fws
@@ -144,7 +144,7 @@ view sharedData page model toMsg pageView =
         List.map toUnstyled <|
             [ Html.Styled.div
                 []
-                [ frameworkNav [ "TidalCycles", "Euterpea", "Kulitta" ]
+                [ Html.Styled.map toMsg <| frameworkNav [ "TidalCycles", "Euterpea", "Kulitta" ]
                 , Html.Styled.h1 [] [ Html.Styled.text ("You are looking at -> " ++ model.framework) ]
                 ]
             , Html.Styled.div [] pageView.body
