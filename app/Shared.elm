@@ -5,9 +5,8 @@ import Css exposing (..)
 import Effect exposing (Effect)
 import FatalError exposing (FatalError)
 import Html exposing (Html)
-import Html.Events
 import Html.Styled exposing (toUnstyled)
-import Html.Styled.Attributes exposing (css, href, src)
+import Html.Styled.Attributes exposing (css)
 import Html.Styled.Events exposing (onClick)
 import Pages.Flags
 import Pages.PageUrl exposing (PageUrl)
@@ -123,10 +122,6 @@ frameworkNav fws =
             )
             fws
         )
-
-
-
--- FIX: The type mismatch
 
 
 view :
