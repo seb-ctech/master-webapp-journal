@@ -1,9 +1,10 @@
-module Route.About exposing (ActionData, Data, Model, Msg, RouteParams, route)
+module Route.About exposing (Model, Msg, RouteParams, route, Data, ActionData)
 
-{-| 
+{-|
+
 @docs Model, Msg, RouteParams, route, Data, ActionData
--}
 
+-}
 
 import BackendTask
 import Effect
@@ -20,6 +21,10 @@ import UrlPath
 import View
 
 
+
+-- This Route is a Information Page about me, the author, the institution and the project's aim and context
+
+
 type alias Model =
     {}
 
@@ -34,7 +39,7 @@ type alias RouteParams =
 
 route : RouteBuilder.StatefulRoute RouteParams Data ActionData Model Msg
 route =
-    RouteBuilder.serverRender { data = data, action = action, head = head }
+    RouteBuilder.single { data = data, head = head }
         |> RouteBuilder.buildWithLocalState
             { view = view
             , init = init
@@ -63,25 +68,25 @@ update app shared msg model =
             ( model, Effect.none )
 
 
-subscriptions :
-    RouteParams -> UrlPath.UrlPath -> Shared.Model -> Model -> Sub Msg
-subscriptions routeParams path shared model = Sub.none
+subscriptions : RouteParams -> UrlPath.UrlPath -> Shared.Model -> Model -> Sub Msg
+subscriptions routeParams path shared model =
+    Sub.none
 
 
 type alias Data =
-    {}
+    { message : String
+    }
 
 
 type alias ActionData =
     {}
 
 
-data :
-    RouteParams
-    -> Server.Request.Request
-    -> BackendTask.BackendTask FatalError.FatalError (Server.Response.Response Data ErrorPage.ErrorPage)
-data routeParams request =
-    BackendTask.succeed (Server.Response.render {})
+data : BackendTask.BackendTask FatalError.FatalError Data
+data =
+    BackendTask.succeed Data
+        |> BackendTask.andMap
+            (BackendTask.succeed "This is the practical part of my Master Project: The Gap in Abstraction between Music Composition and Programming for the programme MA Creative Technologies at Filmuniversität Babelsberg Konrad Wolf")
 
 
 head : RouteBuilder.App Data ActionData RouteParams -> List Head.Tag
@@ -95,7 +100,7 @@ view :
     -> Model
     -> View.View (PagesMsg.PagesMsg Msg)
 view app shared model =
-    { title = "About", body = [ Html.h2 [] [ Html.text "New Page" ] ] }
+    { title = "About", body = [ Html.h2 [] [ Html.text app.data.message ] ] }
 
 
 action :

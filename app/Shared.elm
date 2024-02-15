@@ -6,13 +6,14 @@ import Effect exposing (Effect)
 import FatalError exposing (FatalError)
 import Html exposing (Html)
 import Html.Styled exposing (toUnstyled)
-import Html.Styled.Attributes exposing (css)
+import Html.Styled.Attributes exposing (css, href)
 import Html.Styled.Events exposing (onClick)
 import Pages.Flags
 import Pages.PageUrl exposing (PageUrl)
 import Route exposing (Route)
 import SharedTemplate exposing (SharedTemplate)
 import UrlPath exposing (UrlPath)
+import Utils exposing (getDocumentedFrameworkNames)
 import View exposing (View)
 
 
@@ -40,7 +41,7 @@ type alias StyledPage msg =
 
 
 type alias Data =
-    ()
+    List String
 
 
 type SharedMsg
@@ -99,7 +100,7 @@ subscriptions _ _ =
 
 data : BackendTask FatalError Data
 data =
-    BackendTask.succeed ()
+    getDocumentedFrameworkNames
 
 
 frameworkNav : List String -> Html.Styled.Html Msg
@@ -117,7 +118,7 @@ frameworkNav fws =
                     [ css
                         [ margin (px 5) ]
                     ]
-                    [ Html.Styled.button [ onClick (SwitchFramework name) ] [ Html.Styled.text name ]
+                    [ Html.Styled.a [ href <| Route.toString <| Route.Framework__Name_ <| { name = name } ] [ Html.Styled.text name ]
                     ]
             )
             fws
@@ -139,8 +140,7 @@ view sharedData page model toMsg pageView =
         List.map toUnstyled <|
             [ Html.Styled.div
                 []
-                [ Html.Styled.map toMsg <| frameworkNav [ "TidalCycles", "Euterpea", "Kulitta" ]
-                , Html.Styled.h1 [] [ Html.Styled.text ("You are looking at -> " ++ model.framework) ]
+                [ Html.Styled.map toMsg <| frameworkNav <| sharedData
                 ]
             , Html.Styled.div [] pageView.body
             ]

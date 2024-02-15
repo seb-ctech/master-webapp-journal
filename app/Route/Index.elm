@@ -14,6 +14,10 @@ import UrlPath
 import View exposing (View)
 
 
+
+-- The Index Page is the neutral Landing Page. It should be eye catching and have a call to action to explore.
+
+
 type alias Model =
     {}
 
@@ -48,7 +52,7 @@ data : BackendTask FatalError Data
 data =
     BackendTask.succeed Data
         |> BackendTask.andMap
-            (BackendTask.succeed "Hello!")
+            (BackendTask.succeed "Software is the Externalization of out thoughts. As human beings, we use abstraction to build mental models of our world. \n This work showcases how Music Composition is interpreted through a variaty of abstractions in Haskell")
 
 
 head :
